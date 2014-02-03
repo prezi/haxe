@@ -29,6 +29,11 @@ package java.internal;
 @:native('haxe.lang.Runtime')
 @:nativeGen
 @:classCode('
+
+    private static class NullParameter {
+
+    }
+
 	public static java.lang.Object getField(haxe.lang.IHxObject obj, java.lang.String field, boolean throwErrors)
 	{
 		if (obj == null && !throwErrors) return null;
@@ -481,10 +486,7 @@ package java.internal;
 							} else if (name.equals("short") || name.equals("java.lang.Short"))
 							{
 								objs[i] = ((java.lang.Number)o).shortValue();
-							} else if (name.equals("long") || name.equals("java.lang.Long"))
-							{
-								objs[i] = ((java.lang.Number)o).longValue();
-							}
+							} 
 						}
 					} //else varargs not handled TODO
 				}
