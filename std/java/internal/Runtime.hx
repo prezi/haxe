@@ -390,19 +390,33 @@ package java.internal;
 		}
 
 		boolean hasNumber = false;
+        boolean hasNull = false;
+        boolean hasBool = false;
 
 		for (int i = 0; i < len; i++)
 		{
 			Object o = args.__get(i);
 			objs[i]= o;
-			cls[i] = o.getClass();
-			boolean isNum = false;
+            boolean isNull = false;
+            boolean isNum = false;
+            boolean isBool = false;
+            if (o ==null) {
+                cls[i] = NullParameter.class;
+                isNull = hasNull = true;
+            } else {
+                cls[i] = o.getClass();
 
-			if (o instanceof java.lang.Number)
-			{
-				cls[i] = java.lang.Number.class;
-				isNum = hasNumber = true;
-			}
+                if (o instanceof Number)
+                {
+                    cls[i] = Number.class;
+                    isNum = hasNumber = true;
+                }
+                if (o instanceof Boolean)
+                {
+                    cls[i] = Boolean.class;
+                    isBool = hasBool = true;
+                }
+            }
 
 			msl = realMsl;
 			realMsl = 0;
@@ -412,7 +426,7 @@ package java.internal;
 				java.lang.Class[] allcls = ms[j].getParameterTypes();
 				if (i < allcls.length)
 				{
-					if (!  ((isNum && allcls[i].isPrimitive()) || allcls[i].isAssignableFrom(cls[i])) )
+                    if (!  ((isNum && allcls[i].isPrimitive()) || (isBool && allcls[i].isPrimitive())  || allcls[i].isAssignableFrom(cls[i])|| (isNull && !allcls[i].isPrimitive())) )
 					{
 						ms[j] = null;
 					} else {
@@ -429,6 +443,9 @@ package java.internal;
 		java.lang.reflect.Method found;
 		if (ms.length == 0 || (found = ms[0]) == null)
 			throw haxe.lang.HaxeException.wrap("No compatible method found for: " + field);
+
+        if (ms.length > 1 && (ms[1]) != null)
+            throw HaxeException.wrap("Multiple compatible method found for: " + field+" possibly called with null parameter.");
 
 		if (hasNumber)
 		{
@@ -455,7 +472,10 @@ package java.internal;
 							} else if (name.equals("float") || name.equals("java.lang.Float"))
 							{
 								objs[i] = ((java.lang.Number)o).floatValue();
-							} else if (name.equals("byte") || name.equals("java.lang.Byte"))
+							} else if (name.equals("long") || name.equals("java.lang.Long"))
+                            {
+                                objs[i] = ((Number)o).longValue();
+                            } else if (name.equals("byte") || name.equals("java.lang.Byte"))
 							{
 								objs[i] = ((java.lang.Number)o).byteValue();
 							} else if (name.equals("short") || name.equals("java.lang.Short"))
