@@ -63,6 +63,7 @@ package java.internal;
 	@:functionCode('
 	return new haxe.lang.Closure(obj, field);
 	')
+
 	public static function closure(obj:Dynamic, field:String):Dynamic
 	{
 		return null;
@@ -120,7 +121,7 @@ package java.internal;
 	}
 
 	@:functionCode('
-		return (obj == null) ? 0.0 : ((java.lang.Number) obj).doubleValue();
+        return (obj == null) ? 0.0 : ((obj instanceof java.lang.Number) ? ((java.lang.Number) obj).doubleValue() : java.lang.Double.valueOf(obj.toString()));
 	')
 	public static function toDouble(obj:Dynamic):Float
 	{
@@ -128,7 +129,7 @@ package java.internal;
 	}
 
 	@:functionCode('
-		return (obj == null) ? false : ((java.lang.Boolean) obj).booleanValue();
+        return (obj == null) ? false : ((obj instanceof java.lang.Boolean) ? ((java.lang.Boolean) obj).booleanValue(): java.lang.Boolean.valueOf(obj.toString()));
 	')
 	public static function toBool(obj:Dynamic):Bool
 	{
@@ -136,7 +137,7 @@ package java.internal;
 	}
 
 	@:functionCode('
-		return (obj == null) ? 0 : ((java.lang.Number) obj).intValue();
+        return (obj == null) ? 0 : ((obj instanceof java.lang.Number) ? ((java.lang.Number) obj).intValue() : java.lang.Integer.valueOf(obj.toString()));
 	')
 	public static function toInt(obj:Dynamic):Int
 	{
@@ -223,16 +224,15 @@ package java.internal;
 				{
 					long l1 = (v1 == null) ? 0L : v1c.longValue();
 					long l2 = (v2 == null) ? 0L : v2c.longValue();
-          return (l1 < l2) ? -1 : (l1 > l2) ? 1 : 0;
+                    return (int) (l1 - l2);
 				} else {
 					double d1 = (v1 == null) ? 0.0 : v1c.doubleValue();
 					double d2 = (v2 == null) ? 0.0 : v2c.doubleValue();
-
-          return (d1 < d2) ? -1 : (d1 > d2) ? 1 : 0;
+                    return (int) (d1 - d2);
 				}
 			}
 			//if it\'s not a number it must be a String
-			return ((java.lang.String) v1).compareTo((java.lang.String) v2);
+            return v1.toString().compareTo(v2.toString());
 	')
 	public static function compare(v1:Dynamic, v2:Dynamic):Int
 	{
